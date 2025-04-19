@@ -1,0 +1,231 @@
+{% extends "dashboard/homepage/base.html" %}
+
+{% block title %}Reports{% endblock %}
+
+{% block content %}
+<h2 class="dashboard-header"><b>Stock Report</b></h2>
+
+<!-- Filters -->
+<div class="row g-3 mb-4 align-items-end" id="filters-container">
+    <!-- State Filter -->
+    <div class="col-sm-6 col-md-4 col-lg-2 {% if param2 != 'Ramraj' %} hidden-filter {% endif %}">
+        <label for="state" class="filter-label">State:</label>
+        <select id="state" class="form-control filter-field select2" aria-label="State">
+            <option value="">🔍 Select State</option>
+        </select>
+    </div>
+
+    <!-- Distributor Filter -->
+    <div class="col-sm-6 col-md-4 col-lg-2 {% if param2 != 'Ramraj' %} hidden-filter {% endif %}">
+        <label for="distributor" class="filter-label">Distributor:</label>
+        <select id="distributor" class="form-control filter-field select2" aria-label="Distributor">
+            <option value="">🔍 Select Distributor</option>
+        </select>
+    </div>
+
+    <!-- Division Filter -->
+    <div class="col-sm-6 col-md-4 col-lg-2">
+        <label for="division" class="filter-label">Division:</label>
+        <select id="division" class="form-control filter-field select2" aria-label="Division">
+            <option value="">🔍 Select Division</option>
+        </select>
+    </div>
+
+    <!-- Category Filter -->
+    <div class="col-sm-6 col-md-4 col-lg-2">
+        <label for="category" class="filter-label">Category:</label>
+        <select id="category" class="form-control filter-field select2" aria-label="Category">
+            <option value="">🔍 Select Category</option>
+        </select>
+    </div>
+
+    <!-- Brand Filter -->
+    <div class="col-sm-6 col-md-4 col-lg-2">
+        <label for="brand" class="filter-label">Brand:</label>
+        <select id="brand" class="form-control filter-field select2" aria-label="Brand">
+            <option value="">🔍 Select Brand</option>
+        </select>
+    </div>
+
+    <!-- Product Filter -->
+    <div class="col-sm-6 col-md-4 col-lg-2">
+        <label for="product" class="filter-label">Product:</label>
+        <select id="product" class="form-control filter-field select2" aria-label="Product">
+            <option value="">🔍 Select Product</option>
+        </select>
+    </div>
+
+    <!-- Buttons (Aligned Properly) -->
+    <div class="col-12 col-md-6 col-lg-2 d-flex gap-2 mt-2">
+        <button id="apply-filters" class="btn btn-gradient w-100">Apply</button>
+        <button id="clear-filters" class="btn btn-outline-dark w-100">Clear</button>
+    </div>
+</div>
+
+<div id="loading-spinner" style="display: none; text-align: center; margin: 20px 0;">
+    <div class="spinner-border text-primary" role="status">
+        <span class="visually-hidden">Loading...</span>
+    </div>
+</div>
+
+<!-- Flexmonster Pivot Table Container -->
+<div id="pivot-container" style="height: 1000px;"></div>
+
+<script>
+document.addEventListener("DOMContentLoaded", function () {
+    const containerId = "pivot-container"; // ID of the container for Flexmonster
+    const flexKey = "{{ flex_key }}"; // Flexmonster license key
+
+    const dropdowns = ["state", "distributor", "division", "category", "brand", "product"];
+    const fetchUrls = {
+        state: "/get_product_state_dropdown_options/",
+        distributor: "/get_product_distributor_dropdown_options/",
+        division: "/get_product_division_dropdown_options/",
+        category: "/get_product_category_dropdown_options/",
+        brand: "/get_product_brand_dropdown_options/",
+        product: "/get_product_dropdown_options/"
+    };
+
+    const stateDropdown = document.getElementById("state");
+    let cur_state = "";
+
+    // Function to fetch and set the initial state (ONLY FOR STATE DROPDOWN)
+    function setDefaultState() {
+        fetch(`/get_current_state/`)
+            .then(response => response.json())
+            .then(data => {
+                if (data.options && data.options.length > 0) {
+                    cur_state = data.options[0]; // Set the first value as the default
+                    stateDropdown.innerHTML = `<option value="${cur_state}">${cur_state}</option>`; // Set as selected value
+                    console.log("Default state set:", cur_state);
+
+                    // After setting the initial state, fetch and populate the full state dropdown
+                    populateStateOptions();
+                }
+            })
+            .catch(error => console.error("Error fetching default state:", error));
+    }
+
+    // Function to populate dropdowns (EXCEPT STATE)
+    const populateDropdown = (dropdownId, options) => {
+        const dropdown = document.getElementById(dropdownId);
+        dropdown.innerHTML = '<option value="">🔍 Select</option>'; // Default empty option
+
+        options.forEach((option) => {
+            const opt = document.createElement("option");
+            opt.value = option;
+            opt.textContent = option;
+            dropdown.appendChild(opt);
+        });
+    };
+
+    // Function to fetch and populate the state dropdown (AFTER DEFAULT STATE IS SET)
+    function populateStateOptions() {
+        fetch(fetchUrls["state"])
+            .then(response => response.json())
+            .then(data => {
+                if (data.options) {
+                    // Save the currently selected value (default state)
+                    let selectedValue = stateDropdown.value;
+                    
+                    // Populate with all available options
+                    populateDropdown("state", data.options);
+
+                    // Ensure the previously selected default value remains selected
+                    stateDropdown.value = selectedValue;
+                }
+            })
+            .catch(error => console.error("Error fetching state options:", error));
+    }
+
+    // Fetch and populate all dropdowns EXCEPT STATE
+    function loadOtherDropdowns() {
+        dropdowns.forEach((dropdown) => {
+            if (dropdown !== "state") { // Skip "state" since it's handled separately
+                fetch(fetchUrls[dropdown])
+                    .then(response => response.json())
+                    .then(data => {
+                        if (data.error) {
+                            console.error(`Error fetching ${dropdown} options:`, data.error);
+                            return;
+                        }
+                        populateDropdown(dropdown, data.options); // No default selection
+                    })
+                    .catch(error => console.error(`Error fetching ${dropdown} options:`, error));
+            }
+        });
+    }
+    const renderFlexmonsterTable = (data) => {
+            const reportFilter = [
+                { uniqueName: "distributor" },
+                { uniqueName: "division" },
+            ];
+
+            const tablerows = [
+                { uniqueName: "state", showSubtotal: false },
+                { uniqueName: "distributor", showSubtotal: false },
+                { uniqueName: "division", showSubtotal: false },
+                { uniqueName: "brand", showSubtotal: false },
+                { uniqueName: "category", showSubtotal: false },
+                { uniqueName: "product", showSubtotal: false },
+            ];
+
+            const measures = [
+                { uniqueName: "total_pcs_qty", aggregation: "sum", showSubtotal: false },
+                { uniqueName: "total_box_qty", aggregation: "sum", showSubtotal: false },
+                { uniqueName: "stkvalue", aggregation: "sum", showSubtotal: false },
+            ];
+
+            flexmonsterInstance = initializeFlexmonster(
+                "pivot-container",
+                data,
+                "{{ flex_key }}",
+                reportFilter,
+                measures,
+                tablerows
+            );
+        };
+
+    // Reset filters function
+    const resetFilters = () => {
+        dropdowns.forEach((id) => document.getElementById(id).value = "");
+        document.querySelectorAll(".filters input").forEach((input) => input.value = "");
+        document.querySelectorAll(".filters input[type='radio'], .filters input[type='checkbox']").forEach((input) => input.checked = false);
+        console.log("Filters cleared.");
+        fetchStockReport();
+    };
+
+    // Fetch stock report data
+    const fetchStockReport = (filters = {}) => {
+        const queryString = new URLSearchParams(filters).toString();
+        showLoading();
+        fetch(`/stock_data/?${queryString}`)
+            .then((response) => response.json())
+            .then((data) => {
+                //console.log("Fetched Stock Report Data:", data);
+                renderFlexmonsterTable(data);
+            })
+            .catch((error) => console.error("Error fetching stock report data:", error))
+            .finally(() => hideLoading());
+    };
+
+    // Apply filters
+    document.getElementById("apply-filters").addEventListener("click", function () {
+        const filters = {};
+        dropdowns.forEach((id) => filters[id] = document.getElementById(id).value);
+        console.log("Applying filters:", filters);
+        fetchStockReport(filters);
+    });
+
+    // Clear filters
+    document.getElementById("clear-filters").addEventListener("click", resetFilters);
+
+    // Initial fetch
+    setDefaultState();
+    loadOtherDropdowns();
+    fetchStockReport();
+    });
+
+    </script>
+    
+{% endblock %}

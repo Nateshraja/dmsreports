@@ -1,0 +1,145 @@
+{% extends "dashboard/homepage/base.html" %}
+
+{% block title %}Sales Pivot View{% endblock %}
+
+{% block content %}
+<h2 class="dashboard-header"><b>SALES QUANTITY COMPARISON</b></h2>
+
+<!-- Filters -->
+<div class="row g-3 align-items-end bg-light px-3 py-3 rounded shadow-sm" id="filters-container">
+    <div class="col-12 col-md-6 col-lg-3 d-flex flex-column">
+        <label for="state_code" class="filter-label mb-1">State:</label>
+        <select id="state_code" class="form-control form-control-sm w-100 select2">
+            <option value="">🔍 Search or select a State</option>
+        </select>
+    </div>
+    <div class="col-12 col-md-6 col-lg-3 d-flex flex-column">
+        <label for="distributor" class="filter-label mb-1">Distributor:</label>
+        <select id="distributor" class="form-control form-control-sm w-100 select2">
+            <option value="">🔍 Search or select a Distributor</option>
+        </select>
+    </div>
+    <div class="col-12 col-md-6 col-lg-2 d-flex gap-2 mt-2">
+        <button id="apply-filters" class="btn btn-gradient w-100">Apply</button>
+        <button id="clear-filters" class="btn btn-outline-dark w-100">Clear</button>
+    </div>
+</div>
+
+<div id="loading-spinner" style="display: none; text-align: center; margin: 20px 0;">
+    <div class="spinner-border text-primary" role="status">
+        <span class="visually-hidden">Loading...</span>
+    </div>
+</div>
+
+<!-- Flexmonster Pivot Table Container -->
+<div id="pivot-container" style="height: 800px;"></div>
+
+<script>
+document.addEventListener("DOMContentLoaded", function () {
+    const distributorDropdown = document.getElementById("distributor");
+    const stateCodeDropdown = document.getElementById("state_code");
+    const applyButton = document.getElementById("apply-filters");
+    const clearButton = document.getElementById("clear-filters");
+
+    function resetFilters() {
+        distributorDropdown.value = "";
+        stateCodeDropdown.value = "";
+    }
+
+    function fetchDropdownOptions(url, dropdown, defaultOptionText) {
+        fetch(url)
+            .then(response => response.json())
+            .then(data => {
+                if (data.error) {
+                    console.error("Error fetching dropdown options:", data.error);
+                } else {
+                    populateDropdown(dropdown, data.options, defaultOptionText);
+                }
+            })
+            .catch(error => console.error("Error fetching dropdown data:", error));
+    }
+
+    function populateDropdown(dropdown, options, defaultOptionText) {
+        dropdown.innerHTML = `<option value="">${defaultOptionText}</option>`;
+        options.forEach(option => {
+            const optionElement = document.createElement("option");
+            optionElement.value = option;
+            optionElement.textContent = option;
+            dropdown.appendChild(optionElement);
+        });
+    }
+
+    function fetchData(distributor, stateCode) {
+        const params = new URLSearchParams({
+            distributor: distributor || "",
+            state_code: stateCode || ""
+        });
+        showLoading();
+        return fetch(`/sales_qty_pivot_view/?${params.toString()}`)
+            .then(response => {
+                if (!response.ok) throw new Error("Failed to fetch sales invoice report.");
+                return response.json();
+            })
+            .catch(error => console.error("Error fetching data:", error))
+            .finally(hideLoading);
+    }
+
+    function renderFlexmonsterTable(data) {
+        new Flexmonster({
+            container: "#pivot-container",
+            componentFolder: "flexmonster/",
+            licenseKey: "{{ flex_key }}",
+            toolbar: true,
+            report: {
+                dataSource: {
+                    type: "json",
+                    data: data
+                },
+                slice: {
+                    rows: [
+                        { uniqueName: "state_code", showSubtotal: false },
+                        { uniqueName: "distributor_code", showSubtotal: false },
+                        { uniqueName: "distributor_name", showSubtotal: false },
+                        { uniqueName: "group1", showSubtotal: false },
+                        { uniqueName: "group2", showSubtotal: false },
+                        { uniqueName: "style_name", showSubtotal: false }
+                    ],
+                    columns: [],
+                    measures: [{ uniqueName: "yearqty", aggregation: "sum" }]
+                },
+                options: {
+                    grid: {
+                        type: "flat",
+                        showFilter: true,
+                        showHeaders: true,
+                        showGrandTotals: "on",
+                        grandTotalsPosition: "bottom"
+                    }
+                }
+            }
+        });
+    }
+
+    applyButton.addEventListener("click", function () {
+        fetchData(distributorDropdown.value, stateCodeDropdown.value)
+            .then(renderFlexmonsterTable)
+            .catch(error => console.error("Error fetching filtered data:", error));
+    });
+
+    clearButton.addEventListener("click", function () {
+        resetFilters();
+        fetchData("", "")
+            .then(renderFlexmonsterTable)
+            .catch(error => console.error("Error resetting filters:", error));
+    });
+
+    resetFilters();
+    fetchDropdownOptions("/get_product_distributor_dropdown_options/", distributorDropdown, "🔍 Search or select a Distributor");
+    fetchDropdownOptions("/get_product_state_dropdown_options/", stateCodeDropdown, "🔍 Search or select a State Code");
+    fetchData("", "")
+        .then(renderFlexmonsterTable)
+        .catch(error => console.error("Error initializing Flexmonster:", error));
+});
+</script>
+
+{% endblock %}

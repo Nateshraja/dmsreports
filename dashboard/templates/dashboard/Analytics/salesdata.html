@@ -1,0 +1,50 @@
+{% extends "dashboard/homepage/base.html" %}
+
+{% block title %}Dashboard Overview{% endblock %}
+
+{% block content %}
+<div class="pagetitle">
+    <h1>Sales Analytics</h1>
+  </div><!-- End Page Title -->
+<!-- Report Navigation Buttons -->
+<div class="d-flex justify-content-between align-items-center">
+    <div class="report-nav-buttons">
+        <button class="btn report-btn active" data-report="overall" data-chart-type="bar">Overall Dashboard (Bar)</button>
+        <button class="btn report-btn" data-report="top-sales" data-chart-type="bar">Top Product Sales</button>
+        <button class="btn report-btn" data-report="top-customer" data-chart-type="bar">Top Customer</button>
+        <button class="btn report-btn" data-report="big-deals" data-chart-type="bar">Big Deals</button>
+    </div>
+<!-- Export Options -->
+    <!-- Export Options -->
+    <div class="export-options d-flex gap-2 mt-3 ms-auto">
+        <button class="btn btn-success export-btn" data-format="png">Export as PNG</button>
+        <button class="btn btn-primary export-btn" data-format="jpg">Export as JPG</button>
+        <button class="btn btn-danger export-btn" data-format="pdf">Export as PDF</button>
+    </div>
+</div>
+
+<!-- Chart Container -->
+<div class="row">
+    <div class="col-lg-12 col-md-12">
+        <div class="chart-container-summary summarycard-icon p-3 shadow-sm">
+            <h5 id="chartTitle"></h5>
+
+            <!-- Individual Chart Containers (Initially Hidden Except 'overall') -->
+            <div id="overallChartContainer" class="chart-container">
+                <canvas id="overall"></canvas>
+            </div>
+            <div id="top-salesChartContainer" class="chart-container" style="display: none;">
+                <canvas id="top-sales"></canvas>
+            </div>
+            <div id="top-customerChartContainer" class="chart-container" style="display: none;">
+                <canvas id="top-customer"></canvas>
+            </div>
+            <div id="big-dealsChartContainer" class="chart-container" style="display: none;">
+                <canvas id="big-deals"></canvas>
+            </div>
+
+        </div>
+    </div>
+</div>
+
+{% endblock %}

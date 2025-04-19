@@ -1,0 +1,414 @@
+/* =============================== */
+/* 🔹 DASHBOARD LAYOUT & GENERAL STYLES */
+/* =============================== */
+
+.dashboard-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+}
+
+.dashboard-header {
+    font-size: 20px;
+    font-weight: bold;
+    color: #714B67;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    text-align: center;
+    padding-bottom: 10px;
+    display: inline-block;
+}
+
+/* =============================== */
+/* 🔹 SALES INVOICE TEXT STYLING */
+/* =============================== */
+
+#sales-invoice {
+    font-size: 1.5rem;
+    font-weight: bold;
+    overflow-x: auto; /* Enables horizontal scrolling */
+    white-space: nowrap;
+    text-overflow: ellipsis;
+}
+
+/* =============================== */
+/* 🔹 INPUT FIELDS & LABELS */
+/* =============================== */
+
+/* Input with Icon */
+.input-icon {
+    position: relative;
+}
+
+.input-icon i {
+    position: absolute;
+    left: 10px;
+    top: 50%;
+    transform: translateY(-50%);
+    font-size: 18px;
+    color: #6c757d;
+    pointer-events: none;
+}
+
+.input-icon input {
+    padding-left: 35px;
+}
+
+/* Form Labels */
+.form-label {
+    font-size: 12px;
+    color: #024e96;
+}
+
+/* =============================== */
+/* 🔹 BUTTON STYLES */
+/* =============================== */
+
+.custom-btn {
+    border-radius: 18px;
+    padding: 7px 7px;
+    font-weight: bold;
+    font-size: 0.7rem;
+    height: 32px;
+    transition: all 0.3s ease;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+/* Apply Filters Button */
+#apply-filters {
+    background: linear-gradient(90deg, #007bff, #0056b3);
+    color: #fff;
+    border: none;
+}
+
+/* Clear Filters Button */
+#clear-filters {
+    background: linear-gradient(90deg, #6c757d, #495057);
+    color: #fff;
+    border: none;
+}
+
+/* Hover Effects */
+#apply-filters:hover {
+    background: linear-gradient(90deg, #0056b3, #003e80);
+    box-shadow: 0 3px 6px rgba(0, 0, 0, 0.2);
+}
+
+#clear-filters:hover {
+    background: linear-gradient(90deg, #495057, #343a40);
+    box-shadow: 0 3px 6px rgba(0, 0, 0, 0.2);
+}
+
+/* Active Button Effect */
+.custom-btn:active {
+    transform: scale(0.98);
+    box-shadow: 0 1.5px 3px rgba(0, 0, 0, 0.2);
+}
+
+/* =============================== */
+/* 🔹 LOADING SPINNER */
+/* =============================== */
+
+#loading-spinner {
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    z-index: 1000;
+    background-color: rgba(255, 255, 255, 0.8);
+    padding: 20px;
+    border-radius: 8px;
+}
+
+/* =============================== */
+/* 🔹 CHART STYLES */
+/* =============================== */
+
+.chart-container-summary {
+    width: 100%;
+    margin-left: 10px;
+    padding: 0px;
+    background: white;
+    border-radius: 12px;
+    box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.1);
+    height: auto ;
+    overflow: auto;
+}
+
+/* Ensure Canvas Fits */
+canvas {
+    width: 100% !important;
+    height: auto !important;
+}
+
+/* =============================== */
+/* 🔹 SECTION DIVIDERS */
+/* =============================== */
+
+.section-line {
+    border-top: 2px solid #ddd;
+    margin: 5px 0;
+    padding: 1px;
+}
+
+/* =============================== */
+/* 🔹 FILTERS SECTION */
+/* =============================== */
+
+.filters-container {
+    background: linear-gradient(135deg, #ffffff, #f8f9fa);
+    padding: 15px;
+    border-radius: 12px;
+    box-shadow: 0px 4px 15px rgba(0, 0, 0, 0.1);
+    transition: all 0.3s ease-in-out;
+}
+
+/* Subtle Hover Effect */
+.filters-container:hover {
+    box-shadow: 0px 6px 18px rgba(0, 0, 0, 0.15);
+}
+
+/* Filter Labels */
+.filter-label {
+    font-weight: 600;
+    color: #333;
+    font-size: 14px;
+    margin-bottom: 6px;
+    display: block;
+}
+
+/* Input Fields & Select Dropdowns */
+.form-control,
+.form-select {
+    border-radius: 8px;
+    border: 1.8px solid #ced4da;
+    font-size: 14px;
+    padding: 10px 12px;
+    background: #ffffff;
+    transition: all 0.3s ease-in-out;
+}
+
+/* Input Focus Effect */
+.form-control:focus,
+.form-select:focus {
+    border-color: #007bff;
+    box-shadow: 0px 0px 8px rgba(0, 123, 255, 0.3);
+}
+
+/* Disabled Input */
+.form-control:disabled,
+.form-select:disabled {
+    background: #e9ecef;
+    cursor: not-allowed;
+    opacity: 0.7;
+}
+
+/* =============================== */
+/* 🔹 FILTER BUTTONS */
+/* =============================== */
+
+.btn-gradient {
+    background: linear-gradient(135deg, #007bff, #0056b3);
+    color: white;
+    border-radius: 8px;
+    padding: 10px 16px;
+    font-weight: 600;
+    text-transform: uppercase;
+    transition: all 0.3s ease-in-out;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+/* Hover Effect */
+.btn-gradient:hover {
+    background: linear-gradient(135deg, #0056b3, #003f7f);
+    transform: scale(1.05);
+    box-shadow: 0px 3px 6px rgba(0, 0, 0, 0.2);
+}
+
+/* Clear Button */
+.btn-outline-light {
+    background: #ffffff;
+    color: #007bff;
+    border: 1.8px solid #007bff;
+    border-radius: 8px;
+    padding: 10px 16px;
+    font-weight: 600;
+    text-transform: uppercase;
+    transition: all 0.3s ease-in-out;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+/* Hover Effect */
+.btn-outline-light:hover {
+    background: #007bff;
+    color: white;
+    transform: scale(1.05);
+    box-shadow: 0px 3px 6px rgba(0, 0, 0, 0.2);
+}
+
+/* =============================== */
+/* 🔹 RESPONSIVENESS */
+/* =============================== */
+
+@media (max-width: 768px) {
+    .filters-container {
+        text-align: center;
+        padding: 12px;
+    }
+
+    .btn-gradient,
+    .btn-outline-light {
+        width: 100%;
+        margin-top: 10px;
+    }
+
+    .form-control,
+    .form-select {
+        font-size: 13px;
+        padding: 8px;
+    }
+}
+
+
+
+
+/* Card styling */
+.custom-summarycard {
+    border-radius: 10px;
+    padding: 12px !important; /* Reduce padding for compact size */
+    min-height: 80px; /* Maintain consistent height */
+    color: #ffffff;
+    font-weight: bold;
+    text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.3);
+    box-shadow: 2px 4px 8px rgba(0, 0, 0, 0.2);
+}
+
+/* Different Card Backgrounds */
+.bg-blue { background: #337eca; }  /* Use white or light yellow for text */
+.bg-green { background: #31d658; } /* Use deep navy (#0e2a1c) or soft white */
+.bg-orange { background: #a35590; } /* Use dark brown (#4a2f1b) or white */
+.bg-red { background: #cc535b; } /* Use light pink (#f7d7dc) or white */
+
+/* Font Colors */
+.text-light-yellow { color: #ecfd00; }  /* Works well on blue */
+.text-soft-white { color: #f8f9fa; } /* Works well on dark backgrounds */
+.text-dark-brown { color: #4a2f1b; } /* Works well on orange */
+.text-deep-navy { color: #0e2a1c; } /* Works well on green */
+.text-light-pink { color: #fffbfc; } /* Works well on red */
+
+/* Applying suggested colors */
+.bg-blue h6, .bg-blue h3 { color: #e7c206; } /* Light yellow */
+.bg-green h6, .bg-green h3 { color: #0e2a1c; } /* Deep navy */
+.bg-orange h6, .bg-orange h3 { color: #ffffff; } /* Dark brown */
+.bg-red h6, .bg-red h3 { color: #ffffff; } /* Light pink */
+
+/* Flexbox for horizontal layout */
+.summary-content {
+    display: flex;
+    align-items: center; /* Align items vertically */
+    gap: 15px; /* Space between icon and text */
+}
+
+/* Adjust icon size and spacing */
+.card-summary-icon {
+    font-size: 34px; /* Increase size */
+    flex-shrink: 0; /* Prevent shrinking */
+    color: #ffffff;
+}
+
+/* Ensure text does not shrink */
+.summary-content span {
+    display: flex;
+    flex-direction: column;
+}
+
+/* Make the text larger
+.large-text {
+    font-size: 26px;
+    font-weight: bold;
+}
+ */
+/* Text Styling */
+.custom-summarycard h6 {
+    font-size: 22px !important; /* Adjusted for better balance */
+    font-weight: bold;
+    margin-bottom: 0px; /* Reduced spacing */
+}
+
+.custom-summarycard h3 {
+    font-size: 25px !important; /* Increased for emphasis */
+    font-weight: bold;
+    margin-bottom: 0; /* Avoid extra spacing */
+}
+
+
+.custom-summarycard h6, .custom-summarycard h3 {
+    font-weight: bold;
+    text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.3); /* Subtle shadow for depth */
+}
+
+
+/* =============================== */
+/* 🔹 Dashboard Nav Buttons */
+/* =============================== */
+.report-nav-buttons {
+    display: flex;
+    gap: 10px;
+    margin-bottom: 15px;
+}
+.report-btn {
+    background: #eee;
+    border: 1px solid #ccc;
+    padding: 8px 12px;
+    cursor: pointer;
+    transition: 0.3s;
+}
+.report-btn.active {
+    background: #714B67;
+    color: white;
+}
+
+
+  /* Custom Table Styling */
+  #stockTable {
+    border-collapse: collapse;
+    width: 100%;
+    font-size: 16px;
+    background: #fff;
+    border-radius: 8px;
+    overflow: hidden;
+}
+
+#stockTable thead {
+    background: #136eac;
+    color: white;
+    text-align: left;
+}
+
+#stockTable tbody tr,td {
+    border : 1px solid #136eac;
+}
+
+#stockTable tbody tr:nth-child(even) {
+    background: #ffffff;
+}
+
+#stockTable tbody tr:hover {
+    background: #ddd;
+}
+
+#stockTable th, #stockTable td {
+    padding: 12px;
+    text-align: left;
+}
+
+.dataTables_wrapper {
+    margin-top: 20px;
+}

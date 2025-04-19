@@ -1,0 +1,91 @@
+{% extends "dashboard/homepage/base.html" %}
+
+{% block title %}Reports{% endblock %}
+
+{% block content %}
+
+        <h1>Purchase Return Report</h1>
+        <!-- Flexmonster Pivot Table -->
+        <div id="pivot-container" style="height: 500px;"></div>
+
+
+
+    <script>
+        // Wait for the DOM to load
+        document.addEventListener('DOMContentLoaded', function() {
+            fetch(`/purchase_return_report/`)
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error('Network response was not ok: ' + response.statusText);
+                    }
+                    return response.json(); // Parse JSON from response
+                })
+                .then(data => {
+                    console.log("Fetched JSON Data:", data); // Debugging line
+                    initFlexmonster(data); // Initialize Flexmonster with the data
+                })
+                .catch(error => {
+                    console.error('There was a problem with the fetch operation:', error);
+                    alert('Failed to load sales data. Please try again later.');
+                });
+        });
+
+        // Function to initialize Flexmonster with purchase data
+        function initFlexmonster(data) {
+            var pivot = new Flexmonster({
+                container: "#pivot-container", // HTML element ID for Flexmonster
+                componentFolder: "https://cdn.flexmonster.com/",
+                toolbar: true, // Enable toolbar
+                report: {
+                    dataSource: {
+                        type: "json", // Data type
+                        data: data // Fetched JSON data from Django view
+                    },
+                    slice: {
+                        rows: [
+                            { uniqueName: "distributor_name" }, // Group rows by distributor name
+                            { uniqueName: "brand", showSubtotal: false },
+                            { uniqueName: "category", showSubtotal: false }
+                        ],
+                        columns: [
+                            { uniqueName: "[Measures]" } // Display measures in the columns
+                        ],
+                        measures: [
+                            {
+                                uniqueName: "po_qty", // Use the PO quantity
+                                aggregation: "sum" // Aggregate by sum
+                            },
+                            {
+                                uniqueName: "po_value", // Use the PO value
+                                aggregation: "sum" // Aggregate by sum
+                            },
+                            {
+                                uniqueName: "rec_qty", // Use the received quantity
+                                aggregation: "sum" // Aggregate by sum
+                            },
+                            {
+                                uniqueName: "rec_value", // Use the received value
+                                aggregation: "sum" // Aggregate by sum
+                            }
+                        ]
+                    },
+                    options: {
+                        grid: {
+                            type: "classic",                 // Use classic layout (Excel-like grid)
+                            showHeaders: true,               // Show row headers
+                            showFilter: true,                // Enable filtering
+                            classicView: true,               // Keep classic form
+                            showRowHierarchies: true,        // Show row hierarchy in headers
+                            showColumnGrandTotals: false,     // Do NOT show grand totals for columns
+                            showSubtotal: false        // Do NOT show grand totals for rows
+                        }
+                    }
+                },
+                reportcomplete: function() {
+                    pivot.expandAllData();  // Expand all rows automatically after the data is loaded
+                }
+            });
+        }
+    </script>
+
+{% endblock %}

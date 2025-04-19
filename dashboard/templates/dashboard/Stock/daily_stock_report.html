@@ -1,0 +1,279 @@
+{% extends "dashboard/homepage/base.html" %}
+
+{% block title %}Reports{% endblock %}
+
+{% block content %}
+<h2 class="dashboard-header text-center mb-5"><b>Stock Report</b></h2>
+
+<!-- Filters -->
+<div class="row g-3 mb-4" id="filters-container" style="max-width: 100%;">
+    <div class="col-sm-6 col-md-4 col-lg-2">
+        <label for="state" class="filter-label">State:</label>
+        <select id="state" class="form-control filter-field">
+            <option value="">Select State</option>
+        </select>
+    </div>
+    <div class="col-sm-6 col-md-4 col-lg-2">
+        <label for="distributor" class="filter-label">Distributor:</label>
+        <select id="distributor" class="form-control filter-field">
+            <option value="">Select Distributor</option>
+        </select>
+    </div>
+    <div class="col-sm-6 col-md-4 col-lg-2">
+        <label for="division" class="filter-label">Division:</label>
+        <select id="division" class="form-control filter-field">
+            <option value="">Select Division</option>
+        </select>
+    </div>
+    <div class="col-sm-6 col-md-4 col-lg-2">
+        <label for="category" class="filter-label">Category:</label>
+        <select id="category" class="form-control filter-field">
+            <option value="">Select Category</option>
+        </select>
+    </div>
+    <div class="col-sm-6 col-md-4 col-lg-2">
+        <label for="brand" class="filter-label">Brand:</label>
+        <select id="brand" class="form-control filter-field">
+            <option value="">Select Brand</option>
+        </select>
+    </div>
+    <div class="col-sm-6 col-md-4 col-lg-2">
+        <label for="product" class="filter-label">Product:</label>
+        <select id="product" class="form-control filter-field">
+            <option value="">Select Product</option>
+        </select>
+    </div>
+    <div class="col-sm-6 col-md-4 col-lg-2">
+        <button id="apply-filters" class="btn btn-primary btn-sm w-100 custom-btn">Apply</button>
+    </div>
+    <div class="col-sm-6 col-md-4 col-lg-2">
+        <button id="clear-filters" class="btn btn-secondary btn-sm w-100 custom-btn">Clear</button>
+    </div>    
+</div>
+<div id="loading-spinner" style="display: none; text-align: center; margin: 20px 0;">
+    <div class="spinner-border text-primary" role="status">
+        <span class="visually-hidden">Loading...</span>
+    </div>
+</div>
+
+<!-- Flexmonster Pivot Table Container -->
+<div id="pivot-container" style="height: 1000px;"></div>
+
+<script>
+document.addEventListener("DOMContentLoaded", function () {
+    const containerId = "pivot-container"; // ID of the container for Flexmonster
+    const flexKey = "{{ flex_key }}"; // Flexmonster license key
+
+    
+    // Fetch filter values for dropdowns
+    fetch("/get_product_state_dropdown_options/")
+        .then((response) => response.json())
+        .then((data) => {
+            if (data.error) {
+                console.error(data.error);
+                return;
+            }
+            populateDropdown("state", data.options);
+            console.log(data.options.map((item) => item.state));
+        })
+        .catch((error) => {
+            console.error("Error fetching state options:", error);
+        });
+
+    fetch("/get_product_distributor_dropdown_options/")
+        .then((response) => response.json())
+        .then((data) => {
+            if (data.error) {
+                console.error(data.error);
+                return;
+            }
+            populateDropdown("distributor", data.options);
+        })
+        .catch((error) => {
+            console.error("Error fetching distributor options:", error);
+        });
+
+    fetch("/get_product_division_dropdown_options/")
+        .then((response) => response.json())
+        .then((data) => {
+            if (data.error) {
+                console.error(data.error);
+                return;
+            }
+            populateDropdown("division", data.options);
+        })
+        .catch((error) => {
+            console.error("Error fetching division options:", error);
+        });
+
+    fetch("/get_product_category_dropdown_options/")
+        .then((response) => response.json())
+        .then((data) => {
+            if (data.error) {
+                console.error(data.error);
+                return;
+            }
+            populateDropdown("category", data.options);
+        })
+        .catch((error) => {
+            console.error("Error fetching category options:", error);
+        });
+
+    fetch("/get_product_brand_dropdown_options/")
+        .then((response) => response.json())
+        .then((data) => {
+            if (data.error) {
+                console.error(data.error);
+                return;
+            }
+            populateDropdown("brand", data.options);
+        })
+        .catch((error) => {
+            console.error("Error fetching brand options:", error);
+        });
+
+    fetch("/get_product_dropdown_options/")
+        .then((response) => response.json())
+        .then((data) => {
+            if (data.error) {
+                console.error(data.error);
+                return;
+            }
+            populateDropdown("product", data.options);
+        })
+        .catch((error) => {
+            console.error("Error fetching product options:", error);
+        });
+
+    // Populate a dropdown with options
+    function populateDropdown(dropdownId, options) {
+        const dropdown = document.getElementById(dropdownId);
+        options.forEach((option) => {
+            const opt = document.createElement("option");
+            opt.value = option;
+            opt.textContent = option;
+            dropdown.appendChild(opt);
+        });
+    }
+
+    const resetFilters = () => {
+        // Reset the values for all the filter fields
+        document.getElementById("state").value = "";  // Clear state filter
+        document.getElementById("distributor").value = "";  // Clear distributor filter
+        document.getElementById("division").value = "";  // Clear division filter
+        document.getElementById("category").value = "";  // Clear category filter
+        document.getElementById("brand").value = "";  // Clear brand filter
+        document.getElementById("product").value = "";  // Clear product filter
+
+        // Optional: Reset any other input fields if needed
+        document.querySelectorAll(".filters input").forEach((input) => {
+            input.value = ""; // Reset input fields to empty
+        });
+
+        // Optional: Reset any other filter controls such as radio buttons or checkboxes
+        document.querySelectorAll(".filters input[type='radio'], .filters input[type='checkbox']").forEach((input) => {
+            input.checked = false; // Uncheck radio buttons/checkboxes
+        });
+
+        console.log("Filters cleared.");
+        fetchStockReport();
+    };
+
+
+    // Apply button functionality
+    document.getElementById("apply-filters").addEventListener("click", function () {
+        const filters = {
+            state: document.getElementById("state").value,
+            distributor: document.getElementById("distributor").value,
+            division: document.getElementById("division").value,
+            category: document.getElementById("category").value,
+            brand: document.getElementById("brand").value,
+            product: document.getElementById("product").value,
+        };
+        console.log("Applying filters:", filters);
+        // Send filters to fetch data for Flexmonster report
+        fetchStockReport(filters);
+    });
+
+    // Clear filters when a clear button is clicked
+    document.getElementById("clear-filters").addEventListener("click", resetFilters);
+
+    // Function to fetch stock report data
+    const fetchStockReport = (filters = {}) => {
+        const queryString = new URLSearchParams(filters).toString();
+        showLoading();
+        fetch(`/stock_data/?${queryString}`)
+            .then((response) => response.json())
+            .then((data) => {
+                console.log("Fetched Stock Report Data:", data);
+                renderFlexmonster(data);
+            })
+            .catch((error) => {
+                console.error("Error fetching stock report data:", error);
+            })
+            .finally(() => {
+            hideLoading(); // Hide the loading spinner after the fetch completes
+            });
+    };
+
+    const renderFlexmonster = (data) => {
+        if (!data || data.length === 0) {
+            console.error("No data provided to render Flexmonster.");
+            return;
+        }
+
+        const fixedColumns = [
+            "state",
+            "distributor",
+            "division",
+            "brand",
+            "category",
+            "product",
+            "style_name",
+            "color_name",
+            "line_total",
+        ];
+
+        // Determine all available columns in the dataset
+        const allColumns = Object.keys(data[0]);
+        const dynamicColumns = allColumns.filter((col) => !fixedColumns.includes(col)); // Remaining columns
+
+        new Flexmonster({
+            container: "#pivot-container",
+            componentFolder: "flexmonster/",
+            licenseKey: flexKey,
+            toolbar: true,
+            report: {
+                dataSource: {
+                    type: "json",
+                    data: data, // Use dynamic data
+                },
+                slice: {
+                    rows: fixedColumns.map((col) => ({ uniqueName: col })), // Add fixed columns as rows
+                    columns: dynamicColumns.map((col) => ({ uniqueName: col })), // Add remaining columns as dynamic columns
+                    measures: dynamicColumns
+                        .filter((col) => typeof data[0][col] === "number")
+                        .map((col) => ({ uniqueName: col })), // Numeric columns as measures
+                },
+                options: {
+                    grid: {
+                        type: "flat", // Tabular format
+                        showFilter: true, // Enable filtering for columns
+                        showHeaders: true, // Ensure headers are visible
+                        showGrandTotals: "on", // Enable grand totals
+                        grandTotalsPosition: "bottom", // Place grand totals at the bottom
+                        frozenHeaders: true, // Freeze headers at the top
+                        frozenColumnsCount: fixedColumns.length, // Freeze fixed columns on the left
+                    },
+                },
+            },
+        });
+    };
+
+
+    // Initial fetch and render
+    fetchStockReport();
+});
+</script>
+
+{% endblock %}

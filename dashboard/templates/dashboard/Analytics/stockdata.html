@@ -1,0 +1,31 @@
+{% extends "dashboard/homepage/base.html" %}
+{% block content %}
+<div class="pagetitle">
+    <h1>Stock Analytics</h1>
+</div>
+<div class="d-flex justify-content-between align-items-center">
+    <div class="report-nav-buttons">
+        <button class="btn report-btn active" data-report="brand" data-chart-type="bar">Brand</button>
+        <button class="btn report-btn" data-report="category" data-chart-type="bar">Category</button>
+        <!--<button class="btn report-btn" data-report="division" data-chart-type="bar">Division</button>-->
+    </div>
+
+    <!-- Export Options -->
+    <div class="export-options d-flex gap-2 mt-3 ms-auto">
+        <button class="btn btn-success export-btn" data-format="png">Export as PNG</button>
+        <button class="btn btn-primary export-btn" data-format="jpg">Export as JPG</button>
+       <!-- <button class="btn btn-danger export-btn" data-format="pdf">Export as PDF</button>-->
+    </div>
+</div>
+<table id="stockTable" class="display" style="width:100%">
+    <thead>
+        <tr>
+            <th>Label</th>
+            <th>Quantity</th>
+            <th>Value</th>
+        </tr>
+    </thead>
+    <tbody></tbody>
+</table>
+
+{% endblock %}

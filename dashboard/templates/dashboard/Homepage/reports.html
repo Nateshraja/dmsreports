@@ -1,0 +1,139 @@
+{% extends "dashboard/homepage/base.html" %}
+
+{% block title %}Reports{% endblock %}
+
+{% block content %}
+    <style>
+        /* Wrapper and Container Styling */
+        .content-wrapper {
+            display: flex;
+            justify-content: flex-start; /* Aligns container to the left */
+            padding: 0px 0;
+        }
+        .reports-container {
+            width: 100%; /* Adjusts container width */
+            max-width: 100%;
+            padding: 0px 0px;
+            display: grid;
+            gap: 1.2rem;
+        }
+
+        /* Section Header */
+        .section-header {
+            font-size: 1.4em;
+            font-weight: 600;
+            color: #0056b3;
+            margin-bottom: 0.8rem;
+            text-align: left;
+            border-bottom: 1px solid #0056b3;
+            padding-bottom: 5px;
+            width: 100%;
+        }
+
+        /* Cards Styling */
+        .reports-section {
+            display: flex;
+            gap: 10px;
+        }
+        .report-card {
+            background-color: #f9f9f9;
+            border-radius: 6px;
+            width: 15%;
+            padding: 12px;
+            text-align: center;
+            transition: transform 0.2s;
+            box-shadow: 0 3px 6px rgba(0, 0, 0, 0.1);
+            border: 1px solid #d3d3d3; /* Adds a border to each card */
+            cursor: pointer;
+        }
+        .report-card:hover {
+            transform: scale(1.04);
+            background-color: #f0f8ff;
+        }
+
+        /* Icon and Title in Card */
+        .report-icon {
+            font-size: 2.2em;
+            color: #0056b3;
+            margin-bottom: 5px;
+        }
+        .report-title {
+            font-size: 1em;
+            font-weight: bold;
+            color: #333;
+            text-decoration: none;
+        }
+    </style>
+<h2 class="dashboard-header text-center mb-5"><b>REPORTS</b></h2>
+
+    <div class="content-wrapper">
+        <div class="reports-container">
+            <!-- Stock Section -->
+            <h2 class="section-header">Stock</h2>
+            <div class="reports-section" onclick="location.href='{% url 'stock_report' %}'">
+                <div class="report-card">
+                    <div class="report-icon">📊</div>
+                    <a href="{% url 'stock_report' %}" class="report-title">Stock Report</a>
+                </div>
+              <!--  <div class="report-card" onclick="location.href='{% url 'daily_stock_report' %}'">
+                    <div class="report-icon">📅</div>
+                    <a href="{% url 'daily_stock_report' %}" class="report-title">Daily Stock Report</a>
+                </div> -->
+            </div>
+
+            <!-- Invoice Section -->
+            <h2 class="section-header">Invoice</h2>
+            <div class="reports-section" onclick="location.href='{% url 'sales_invoice' %}'">
+                <div class="report-card">
+                    <div class="report-icon">💸</div>
+                    <a href="{% url 'sales_invoice' %}" class="report-title">Sales Invoice</a>
+                </div>
+             <!--   <div class="report-card" onclick="location.href='{% url 'sales_return' %}'">
+                    <div class="report-icon">↩️</div>
+                    <a href="{% url 'sales_return' %}" class="report-title">Sales Returns</a>
+                </div> -->
+            </div>
+
+            <!-- Purchase Section -->
+            <h2 class="section-header">Purchase</h2>
+            <div class="reports-section" onclick="location.href='{% url 'purchase_order' %}'">
+                <div class="report-card">
+                    <div class="report-icon">🛒</div>
+                    <a href="{% url 'purchase_order' %}" class="report-title">Purchase Orders</a>
+                </div>
+               <!-- <div class="report-card" onclick="location.href='{% url 'purchase_receipt' %}'">
+                    <div class="report-icon">📥</div>
+                    <a href="{% url 'purchase_receipt' %}" class="report-title">Purchase Receipts</a>
+                </div>
+                <div class="report-card" onclick="location.href='{% url 'purchase_return' %}'">
+                    <div class="report-icon">↩️</div>
+                    <a href="{% url 'purchase_return' %}" class="report-title">Purchase Returns</a>
+                </div>
+                <div class="report-card" onclick="location.href='{% url 'purchase_return' %}'">
+                    <div class="report-icon">↩️</div>
+                    <a href="{% url 'purchase_return' %}" class="report-title">Purchase Returns</a>
+                </div>-->
+            </div>
+
+            <!-- Masters Section -->
+            <h2 class="section-header">Masters</h2>
+            <div class="reports-section">
+                <div class="report-card" onclick="location.href='{% url 'customers' %}'">
+                    <div class="report-icon">👥</div>
+                    <a href="{% url 'customers' %}" class="report-title">Customers</a>
+                </div>
+                <!--<div class="report-card" onclick="location.href='{% url 'vendor_report' %}'">
+                    <div class="report-icon">🏢</div>
+                    <a href="{% url 'vendor_report' %}" class="report-title">Vendors</a>
+                </div>-->
+                <div class="report-card" onclick="location.href='{% url 'products' %}'">
+                    <div class="report-icon">📦</div>
+                    <a href="{% url 'products' %}" class="report-title">Products</a>
+                </div>
+            </div>
+
+
+
+        </div>
+    </div>
+{% endblock %}

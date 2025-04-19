@@ -1,0 +1,166 @@
+{% extends "dashboard/homepage/base.html" %}
+
+{% block title %}Reports{% endblock %}
+
+{% block content %}
+<h2 class="dashboard-header"><b>CUSTOMERS</b></h2>
+
+<!-- Filters -->
+<div class="row g-3 align-items-end bg-light px-3 py-3 rounded shadow-sm" id="filters-container">
+    <div class="col-12 col-md-6 col-lg-3 d-flex flex-column {% if param2 != 'Ramraj' %} hidden-filter {% endif %}">
+        <label for="state" class="filter-label mb-1">State:</label>
+        <select id="state" class="form-control form-control-sm w-100 select2">
+            <option value="">🔍 Search or select a State</option>
+        </select>
+    </div>
+
+    <div class="col-12 col-md-6 col-lg-3 d-flex flex-column {% if param2 != 'Ramraj' %} hidden-filter {% endif %}">
+        <label for="distributor" class="filter-label mb-1">Distributor:</label>
+        <select id="distributor" class="form-control form-control-sm w-100 select2">
+            <option value="">🔍 Search or select a Distributor</option>
+        </select>
+    </div>
+    <div class="col-12 col-md-6 col-lg-3 d-flex flex-column">
+        <label for="cardcode" class="filter-label mb-1">Cardcode:</label>
+        <select id="cardcode" class="form-control form-control-sm w-100 select2">
+            <option value="">🔍 Search or select a Cardcode</option>
+        </select>
+    </div>
+    
+    <div class="col-12 col-md-6 col-lg-3 d-flex flex-column">
+        <label for="customer" class="filter-label mb-1">Customer:</label>
+        <select id="customer" class="form-control form-control-sm w-100 select2">
+            <option value="">🔍 Search or select a Customer</option>
+        </select>
+    </div>
+    <div class="col-12 col-md-6 col-lg-2 d-flex gap-2 mt-2">
+        <button id="apply-filters" class="btn btn-gradient w-100">Apply</button>
+        <button id="clear-filters" class="btn btn-outline-dark w-100">Clear</button>
+    </div>
+</div>
+
+<div id="loading-spinner" style="display: none; text-align: center; margin: 20px 0;">
+    <div class="spinner-border text-primary" role="status">
+        <span class="visually-hidden">Loading...</span>
+    </div>
+</div>
+
+<!-- Flexmonster Pivot Table Container -->
+<div id="pivot-container" style="height: 800px;"></div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+    const flexKey = "{{ flex_key }}";
+    let allCustomerData = []; // Store the complete data set
+    const containerId = "pivot-container";
+    showLoading();
+    // Fetch customer data and initialize Flexmonster
+    fetch(`/customers_report/`)
+        .then(response => response.json())
+        .then(data => {
+            allCustomerData = data;
+            populateFilterOptions(data); // Populate filter options
+            renderFlexmonster(data);    // Initialize Flexmonster
+        })
+        .catch(error => {
+            console.error('Error fetching data:', error);
+            alert('Failed to load customer data. Please try again later.');
+        })
+        .finally(() => {
+            hideLoading(); // Hide the loading spinner after the fetch completes
+        });        
+
+    // Initialize Flexmonster with data
+    function renderFlexmonster(data) {
+        new Flexmonster({
+            container: `#${containerId}`,
+            componentFolder: "flexmonster/",
+            licenseKey: flexKey,
+            toolbar: true,
+            report: {
+                dataSource: {
+                    type: "json",
+                    data: data,
+                },
+                slice: {
+                    rows: [
+                        { uniqueName: "cardcode", showSubtotal: false },
+                        { uniqueName: "customer", showSubtotal: false },
+                        { uniqueName: "state_code", showSubtotal: false },
+                        { uniqueName: "dist_name", showSubtotal: false },
+                    ],
+                },
+                options: {
+                    grid: {
+                        type: "flat",
+                        showFilter: true,
+                        showHeaders: true,
+                        showGrandTotals: "off",
+                    },
+                },
+            },
+        });
+    }
+
+    // Populate dropdown filters
+    function populateFilterOptions(data) {
+        const cardcodes = new Set();
+        const customers = new Set();
+        const states = new Set();
+        const distributors = new Set();
+
+        data.forEach(item => {
+            if (item.cardcode) cardcodes.add(item.cardcode);
+            if (item.customer) customers.add(item.customer);
+            if (item.state_code) states.add(item.state_code);
+            if (item.dist_name) distributors.add(item.dist_name);
+        });
+
+        populateSelect('cardcode', cardcodes);
+        populateSelect('customer', customers);
+        populateSelect('state', states);
+        populateSelect('distributor', distributors);
+    }
+
+    // Populate select dropdown
+    function populateSelect(id, options) {
+        const select = document.getElementById(id);
+        select.innerHTML = `<option value="">Search or select</option>`;
+        options.forEach(option => {
+            const opt = document.createElement('option');
+            opt.value = option;
+            opt.textContent = option;
+            select.appendChild(opt);
+        });
+    }
+
+    // Apply filters
+    document.getElementById('apply-filters').addEventListener('click', () => {
+        const cardcode = document.getElementById('cardcode').value;
+        const customer = document.getElementById('customer').value;
+        const state = document.getElementById('state').value;
+        const distributor = document.getElementById('distributor').value;
+
+        const filteredData = allCustomerData.filter(item => {
+            return (!cardcode || item.cardcode === cardcode) &&
+                (!customer || item.customer === customer) &&
+                (!state || item.state_code === state) &&
+                (!distributor || item.dist_name === distributor);
+        });
+
+        renderFlexmonster(filteredData);
+    });
+
+    // Clear filters
+    document.getElementById('clear-filters').addEventListener('click', () => {
+        document.getElementById('cardcode').value = '';
+        document.getElementById('customer').value = '';
+        document.getElementById('state').value = '';
+        document.getElementById('distributor').value = '';
+
+        renderFlexmonster(allCustomerData);
+    });
+});
+</script>
+
+{% endblock %}

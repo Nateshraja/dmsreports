@@ -1,0 +1,113 @@
+{% load static %}
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sales Report</title>
+    <!-- Bootstrap CSS -->
+    <link rel="stylesheet" href="{% static 'css/bootstrap.min.css' %}">
+    <!-- Bootstrap JS Bundle -->
+    <script src="{% static 'js/bootstrap.bundle.min.js' %}"></script>
+    <!-- Flexmonster JS -->
+    <script src="{% static 'js/flexmonster.js' %}"></script>
+</head>
+<body>
+
+    <div class="container-fluid">
+        <h2 class="mt-4">Sales Report</h2>
+        <!-- Back to Dashboard Button -->
+        <a id="back-to-dashboard" href="#" class="btn btn-primary mb-3">Back to Dashboard</a>
+
+        <!-- Pivot Table Container -->
+        <div id="pivot-container" style="height: 600px;"></div>
+    </div>
+
+    <script>
+        // Wait for the DOM to load
+        document.addEventListener('DOMContentLoaded', function() {
+            // Extract 'cardcode' from the URL
+            const urlParams = new URLSearchParams(window.location.search);
+            const cardcode = urlParams.get('cardcode'); // 'cardcode' is the parameter passed from the dashboard
+            document.getElementById('back-to-dashboard').href = `/dashboard/?param=${cardcode}`;
+
+            if (cardcode) {
+                // Fetch sales data from the Django view with the cardcode parameter
+                fetch(`/sales/?cardcode=${cardcode}`)
+                    .then(response => {
+                        if (!response.ok) {
+                            throw new Error('Network response was not ok ' + response.statusText);
+                        }
+                        return response.json(); // Parse JSON from response
+                    })
+                    .then(data => {
+                        console.log("Fetched JSON Data:", data); // Debugging line
+
+                        // Initialize Flexmonster with the fetched sales data
+                        initFlexmonster(data);
+                    })
+                    .catch(error => {
+                        console.error('There was a problem with the fetch operation:', error);
+                        alert('Failed to load sales data. Please try again later.');
+                    });
+            } else {
+                console.error('Missing cardcode parameter');
+                alert('Missing cardcode parameter in the URL.');
+            }
+        });
+
+        // Function to initialize Flexmonster with sales data
+        function initFlexmonster(data) {
+            var pivot = new Flexmonster({
+                container: "#pivot-container", // HTML element ID for Flexmonster
+                componentFolder: "https://cdn.flexmonster.com/",
+                toolbar: true, // Enable toolbar
+                report: {
+                    dataSource: {
+                        type: "json", // Data type
+                        data: data // Fetched JSON data from Django view
+                    },
+                    slice: {
+                        rows: [
+                            { uniqueName: "distributor_name", showSubtotal: false }, // Group rows by distributor name without subtotals
+                            { uniqueName: "brand", showSubtotal: false },            // Group rows by brand without subtotals
+                            { uniqueName: "prod_category", showSubtotal: false }     // Group rows by product category without subtotals
+                        ],
+                        columns: [
+                            { uniqueName: "[Measures]" } // Display measures in the columns
+                        ],
+                        measures: [
+                            {
+                                uniqueName: "yearsales", // Use the sales amount
+                                aggregation: "sum" // Aggregate by sum
+                            },
+                            {
+                                uniqueName: "doctotal", // Use the document total amount
+                                aggregation: "sum" // Aggregate by sum
+                            },
+                            {
+                                uniqueName: "scheme_amt", // Use the scheme amount
+                                aggregation: "sum" // Aggregate by sum
+                            }
+                        ]
+                    },
+                    options: {
+                        grid: {
+                            type: "classic",                 // Use classic layout (Excel-like grid)
+                            showHeaders: true,               // Show row headers
+                            showFilter: true,                // Enable filtering
+                            classicView: true,               // Enable filtering
+                            showRowHierarchies: true         // Show row hierarchies
+                        }
+                    }
+                    },
+                    reportcomplete: function() {
+                        pivot.expandAllData();  // Expand all rows automatically after the data is loaded
+                    }
+                });
+        }
+    </script>
+
+</body>
+</html>

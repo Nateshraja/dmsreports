@@ -1,0 +1,252 @@
+{% extends "dashboard/homepage/base.html" %}
+{% block content %}
+    <div class="pagetitle">
+      <h1>Dashboard</h1>
+     <!-- <nav>
+        <ol class="breadcrumb">
+          <li class="breadcrumb-item"><a href="index.html">Home</a></li>
+          <li class="breadcrumb-item active">Dashboard</li>
+        </ol>
+      </nav>-->
+    </div><!-- End Page Title -->
+    <section class="section dashboard">
+      <div class="row">
+
+        <!-- Left side columns -->
+        <div class="col-lg-12">
+          <div class="row">
+
+            <!-- Sales Card -->
+            <div class="col-xxl-4 col-md-6">
+              <div class="card info-card sales-card summarycard-icon">
+                <div class="card-body salesborder">
+                  <h5 class="card-title">Total Sales</h5>
+
+                  <div class="d-flex align-items-center ">
+                    <div class="card-icon rounded-circle d-flex align-items-center justify-content-center ">
+                      <i class="bi bi-cart"></i>
+                    </div>
+                    <div class="ps-1">
+                      <h6 id="sales-qty" class="fs-5 text-truncate" style="max-width: 500px;">Pcs  : --</h6>
+                      <h6 id="sales-invoice" class="fs-5 text-truncate" style="max-width: 500px;">Value: --</h6>
+                      <!--<span class="text-muted small pt-2">Total Sales</span>-->
+                  </div>                  
+                  </div>
+                </div>
+
+              </div>
+            </div><!-- End Sales Card -->
+
+            <!-- Revenue Card -->
+            <div class="col-xxl-4 col-md-6">
+              <div class="card info-card revenue-card summarycard-icon">
+
+                <div class="card-body purchaseborder">
+                  <h5 class="card-title">Total Purchases </h5>
+
+                  <div class="d-flex align-items-center ">
+                    <div class="card-icon rounded-circle d-flex align-items-center justify-content-center ">
+                      <i class="bi bi-currency-rupee"></i>
+                    </div>
+                    <div class="ps-1">
+                      <h6 id="purchases-qty" class="fs-5 text-truncate" style="max-width: 500px;">Pcs  : --</h6>
+                      <h6 id="purchases-invoice" class="fs-5 text-truncate" style="max-width: 500px;">Value: --</h6>
+                       <!-- <span class="text-muted small pt-2">Total Purchases</span>-->
+                    </div>
+                  </div>
+                </div>
+
+              </div>
+            </div><!-- End Revenue Card -->
+
+            <!-- Customers Card -->
+            <div class="col-xl-4 col-md-6">
+              <div class="card info-card customers-card summarycard-icon">
+                  <div class="card-body">
+                      <h5 class="card-title">Stocks</h5>
+                      <div class="d-flex align-items-center">
+                          <div class="card-icon rounded-circle d-flex align-items-center justify-content-center">
+                              <i class="bi bi-box-seam"></i> <!-- Box Icon -->
+                          </div>
+                          <div class="ps-1">
+                                  <!-- <h6 id="box-qty" class="fs-6 fw-bold text-truncate">Box  : --</h6> -->
+                                  <h6 id="pcs-qty" class="fs-5 text-truncate" style="max-width: 500px;">Pcs  : --</h6>
+                                  <h6 id="stock-value" class="fs-5 text-truncate" style="max-width: 500px;">Value: --</h6>
+                          </div>
+                      </div>
+                  </div>
+              </div>
+          </div>
+        </div>
+      </div>
+
+    <div class="section-line"></div>
+    <div class="col-lg-12">
+      <h5 class="card-title">Sale Order Summary</h5>
+      <div class="row g-3 mb-3">
+          <div class="col-lg-3 col-sm-6">
+              <div class="card shadow-sm p-2 custom-summarycard bg-blue">
+                  <div class="summary-content">
+                      <i class="fas fa-shopping-cart card-summary-icon"></i>
+                      <span>
+                          <h6  >Today SO</h6>
+                          <h3   id="saleordercount">
+                              
+                           &nbsp; 0</h3>
+                      </span>
+                  </div>
+              </div>
+          </div>
+          <div class="col-lg-3 col-sm-6">
+              <div class="card shadow-sm p-2 custom-summarycard bg-orange">
+                  <div class="summary-content">
+                      <i class="fas fa-box card-summary-icon"></i>
+                      <span>
+                          <h6  >Today SO Qty</h6>
+                          <h3   id="saleorderQty">&nbsp;0</h3>
+                      </span>
+                  </div>
+              </div>
+          </div>
+          <div class="col-lg-3 col-sm-6">
+              <div class="card shadow-sm p-2 custom-summarycard bg-green">
+                  <div class="summary-content">
+                      <i class="bi bi-cash-stack card-summary-icon"></i>
+                      <span>
+                          <h6  >Today SO Amount</h6>
+                          <h3   id="so_amount">&nbsp;0</h3>
+                      </span>
+                  </div>
+              </div>
+          </div>
+          <div class="col-lg-3 col-sm-6">
+              <div class="card shadow-sm p-2 custom-summarycard bg-red">
+                  <div class="summary-content">
+                      <i class="fas fa-exclamation-triangle card-summary-icon"></i>
+                      <span>
+                          <h6  >Pending Orders</h6>
+                          <h3   id="pendingorder">&nbsp;0</h3>
+                      </span>
+                  </div>
+              </div>
+          </div>
+      </div>
+  </div>
+  
+
+    <div class="section-line"></div>
+    <div class="col-lg-12">
+      <h5 class="card-title">Invoice Summary</h5>
+      <div class="row g-3 mb-3">
+          <div class="col-lg-3 col-sm-6">
+              <div class="card shadow-sm p-2 custom-summarycard bg-blue">
+                  <div class="summary-content">
+                      <i class="fas fa-file-invoice card-summary-icon"></i>
+                      <span>
+                          <h6  >Today Invoice Count</h6>
+                          <h3  id="invoicecount">&nbsp;0</h3>
+                      </span>
+                  </div>
+              </div>
+          </div>
+          <div class="col-lg-3 col-sm-6">
+              <div class="card shadow-sm p-2 custom-summarycard bg-orange">
+                  <div class="summary-content">
+                      <i class="fas fa-coins card-summary-icon"></i>
+                      <span>
+                          <h6 >Today Invoice Qty</h6>
+                          <h3  id="invoiceQty">&nbsp;0</h3>
+                      </span>
+                  </div>
+              </div>
+          </div>
+          <div class="col-lg-3 col-sm-6">
+              <div class="card shadow-sm p-2 custom-summarycard bg-green">
+                  <div class="summary-content">
+                      <i class="bi bi-cash-stack card-summary-icon"></i>
+                      <span>
+                          <h6  >Sales Amount</h6>
+                          <h3   id="salesAmount">&nbsp;0</h3>
+                      </span>
+                  </div>
+              </div>
+          </div>
+          <!-- Uncomment if needed -->
+          <!--
+          <div class="col-lg-3 col-sm-6">
+              <div class="card shadow-sm p-2 custom-summarycard bg-blue">
+                  <div class="summary-content">
+                      <i class="fas fa-exclamation-triangle card-summary-icon"></i>
+                      <span>
+                          <h6  >Pending Invoices</h6>
+                          <h3   id="pendingInvoices">0</h3>
+                      </span>
+                  </div>
+              </div>
+          </div>
+          -->
+      </div>
+  </div>  
+    
+      <div class="section-line"></div>
+      <h5 id="chartTitle">Sales Analytics</h5>
+      <div class="report-nav-buttons">
+        <button class="btn report-btn active" data-report="overall" data-chart-type="bar">Overall Dashboard (Bar)</button>
+        <!--<button class="btn report-btn" data-report="overall" data-chart-type="line">Overall Dashboard (Line)</button>-->
+        <button class="btn report-btn" data-report="top-sales" data-chart-type="bar">Top Product Sales</button>
+        <button class="btn report-btn" data-report="top-customer" data-chart-type="bar">Top Customer</button>
+        <button class="btn report-btn" data-report="big-deals" data-chart-type="bar">Big Deals</button>
+    </div>
+    
+    
+    <!-- Chart Container -->
+     
+    <div class="row">
+        
+        <div class="col-lg-12 col-md-12">
+            <div class="chart-container-summary summarycard-icon p-3 shadow-sm">
+    
+                <!-- Individual Chart Containers (Initially Hidden Except 'overall') -->
+                <div id="overallChartContainer" class="chart-container">
+                    <canvas id="overall"></canvas>
+                </div>
+                <div id="top-salesChartContainer" class="chart-container" style="display: none;">
+                    <canvas id="top-sales"></canvas>
+                </div>
+                <div id="top-customerChartContainer" class="chart-container" style="display: none;">
+                    <canvas id="top-customer"></canvas>
+                </div>
+                <div id="big-dealsChartContainer" class="chart-container" style="display: none;">
+                    <canvas id="big-deals"></canvas>
+                </div>   
+    
+            </div>
+        </div>
+    </div>
+    <div class="section-line"></div>
+    <h5 id="chartTitle">Stock Analytics</h5>
+    <div class="report-nav-buttons">
+        <button class="btn report-btn active" data-report="brand">Brand Wise</button>
+        <button class="btn report-btn" data-report="category">Category Wise</button>
+    </div>
+    <table id="stockTable" class="display" style="width:100%">
+        <thead>
+            <tr>
+                <th>Label</th>
+                <th>Quantity</th>
+                <th>Value</th>
+            </tr>
+        </thead>
+        <tbody></tbody>
+    </table>
+    
+      <br>
+      <div class="section-line"></div>
+        
+          
+        
+      </div>
+      
+    </section>
+    
+    {% endblock %}

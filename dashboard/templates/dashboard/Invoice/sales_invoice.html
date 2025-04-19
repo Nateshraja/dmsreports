@@ -1,0 +1,182 @@
+{% extends "dashboard/homepage/base.html" %}
+
+{% block title %}Sales Invoice Report{% endblock %}
+
+{% block content %}
+<h2 class="dashboard-header">Sales Invoice Report</h2>
+<!-- Filters -->
+<div class="filters-container bg-light p-3 rounded shadow-sm">
+    <div class="row g-3 align-items-end">
+        <div class="col-lg-2 col-md-4 col-sm-6">
+            <label for="from-date" class="filter-label mb-1">From Date:</label>
+            <input type="date" id="from-date" class="form-control form-control-sm " required>
+        </div>
+        
+        <div class="col-lg-2 col-md-4 col-sm-6">
+            <label for="to-date" class="filter-label mb-1">To Date:</label>
+            <input type="date" id="to-date" class="form-control form-control-sm " required>
+        </div>
+        <div class="col-lg-3 col-md-6 col-sm-12 {% if param2 != 'Ramraj' %}hidden-filter{% endif %}">
+            <label for="distributor" class="filter-label mb-1">Distributor:</label>
+            <select id="distributor" class="form-select form-select-sm select2">
+                <option value="">🔍 Search or select a Distributor</option>
+            </select>
+        </div>        
+        <div class="col-lg-3 col-md-6 col-sm-12">
+            <label for="group1" class="filter-label mb-1">Group1:</label>
+            <select id="group1" class="form-select form-select-sm select2">
+                <option value="">🔍 Search or select a Group1</option>
+            </select>
+        </div>
+        <div class="col-lg-3 col-md-6 col-sm-12">
+            <label for="division" class="filter-label mb-1">Division:</label>
+            <select id="division" class="form-select form-select-sm select2">
+                <option value="">🔍 Search or select a division</option>
+            </select>
+        </div>
+        <div class="col-lg-2 col-md-12 text-center d-flex justify-content-center gap-2 mt-2">
+            <button id="apply-filters" class="btn btn-gradient px-4">Apply</button>
+            <button id="clear-filters" class="btn btn-outline-dark px-4">Clear</button>
+        </div>
+    </div>
+</div>
+
+<div id="loading-spinner" style="display: none; text-align: center; margin: 20px 0;">
+    <div class="spinner-border text-primary" role="status">
+        <span class="visually-hidden">Loading...</span>
+    </div>
+</div>
+<!-- Flexmonster Pivot Table -->
+<div id="pivot-container" style="height: 600px;"></div>
+
+<script>
+    document.addEventListener("DOMContentLoaded", function () {
+        const fromDateInput = document.getElementById("from-date");
+        const toDateInput = document.getElementById("to-date");
+        const group1Dropdown = document.getElementById("group1");
+        const divisionDropdown = document.getElementById("division");
+        const distributorDropdown = document.getElementById("distributor");
+        const applyButton = document.getElementById("apply-filters");
+        const clearButton = document.getElementById("clear-filters");
+
+        const currentDate = new Date();
+        const oneMonthAgo = new Date();
+        oneMonthAgo.setDate(currentDate.getDate() - 1);
+        const formatDate = (date) => date.toISOString().split("T")[0];
+
+        const resetFilters = () => {
+            fromDateInput.value = formatDate(oneMonthAgo);
+            toDateInput.value = formatDate(currentDate);
+            divisionDropdown.value = "";
+            group1Dropdown.value = "";
+            distributorDropdown.value = "";
+        };
+
+        const fetchDropdownOptions = (url, dropdown, defaultOptionText) => {
+            return fetch(url)
+                .then((response) => response.json())
+                .then((data) => {
+                    if (data.error) {
+                        console.error("Error fetching dropdown options:", data.error);
+                    } else {
+                        //console.log(data.options)
+                        populateDropdown(dropdown, data.options, defaultOptionText);
+                    }
+                })
+                .catch((error) => console.error("Error fetching dropdown data:", error));
+        };
+
+        const populateDropdown = (dropdown, options, defaultOptionText) => {
+            dropdown.innerHTML = `<option value="">${defaultOptionText}</option>`;
+            options.forEach((option) => {
+                const optionElement = document.createElement("option");
+                optionElement.value = option;
+                optionElement.textContent = option;
+                dropdown.appendChild(optionElement);
+            });
+        };
+
+        const fetchData = (fromDate, toDate, division,group1,distributor) => {
+            const params = new URLSearchParams({
+                from_date: fromDate,
+                to_date: toDate,
+                division: division || "",
+                group1: group1 || "",
+                distributor: distributor || "",
+            });
+            console.log(params.toString())
+            showLoading();
+            return fetch(`/sales_invoice_report/?${params.toString()}`)
+                .then((response) => {
+                    if (!response.ok) throw new Error("Failed to fetch sales invoice report.");
+                    return response.json();
+                })
+                .catch((error) => console.error("Error fetching data:", error))
+                .finally(() => {
+                    hideLoading(); // Hide the loading spinner after the fetch completes
+                });
+        };
+
+        const renderFlexmonsterTable = (data) => {
+            const reportFilter = [
+                { uniqueName: "distributor_name" },
+                { uniqueName: "state_code" },
+                { uniqueName: "category" },
+                { uniqueName: "invoice_date" },
+                { uniqueName: "division" },
+            ];
+
+            const tablerows = [
+                { uniqueName: "distributor_name", showSubtotal: false },
+                { uniqueName: "division", showSubtotal: false },
+                { uniqueName: "category", showSubtotal: false },
+            ];
+
+            const measures = [
+                { uniqueName: "inv_qty", aggregation: "sum" },
+                { uniqueName: "inv_amt", aggregation: "sum" },
+            ];
+
+            flexmonsterInstance = initializeFlexmonster(
+                "pivot-container",
+                data,
+                "{{ flex_key }}",
+                reportFilter,
+                measures,
+                tablerows
+            );
+        };
+
+        applyButton.addEventListener("click", function () {
+            if (!fromDateInput.value || !toDateInput.value) {
+                alert("Please select both From Date and To Date.");
+                return;
+            }
+            fetchData(
+                fromDateInput.value,
+                toDateInput.value,
+                divisionDropdown.value,
+                group1Dropdown.value,
+                distributorDropdown.value
+            )
+                .then((data) => renderFlexmonsterTable(data))
+                .catch((error) => console.error("Error fetching filtered data:", error));
+        });
+
+        clearButton.addEventListener("click", function () {
+            resetFilters();
+            fetchData(fromDateInput.value, toDateInput.value, "", "")
+                .then((data) => renderFlexmonsterTable(data))
+                .catch((error) => console.error("Error resetting filters:", error));
+        });
+
+        resetFilters();
+        fetchDropdownOptions("/get_product_distributor_dropdown_options/", distributorDropdown, "🔍 Search or select a Distributor");
+        fetchDropdownOptions("/get_group1_dropdown_options/", group1Dropdown, "🔍 Search or select a Group1");
+        fetchDropdownOptions("/get_product_division_dropdown_options/", divisionDropdown, "🔍 Search or select a Division");
+        fetchData(fromDateInput.value, toDateInput.value, "", "")
+            .then((data) => renderFlexmonsterTable(data))
+            .catch((error) => console.error("Error initializing Flexmonster:", error));
+    });
+</script>
+{% endblock %}

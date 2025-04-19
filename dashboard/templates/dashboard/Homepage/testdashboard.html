@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Submit Parameters</title>
+    <link rel="stylesheet" href="css/bootstrap.min.css">
+    <script src="js/bootstrap.bundle.min.js"></script>
+</head>
+<body>
+    <div class="container mt-5">
+        <h1>Submit Parameters</h1>
+        <form action="http://192.168.179.19:8000/login/" method="GET" target="_blank">
+            <!-- Parameter 1 -->
+            <div class="form-group mb-3">
+                <label for="param1">Enter Parameter 1</label>
+                <input type="text" id="param1" name="param1" class="form-control" placeholder="Enter first parameter" required oninput="this.value = this.value.toUpperCase()">
+            </div>
+            
+            <!-- Parameter 2 -->
+            <div class="form-group mb-3">
+                <label for="param2">Select Parameter 2</label>
+                <select id="param2" name="param2" class="form-control" required>
+                    <option value="" disabled selected>Select an option</option>
+                    <option value="Distributor">Distributor</option>
+                    <option value="Ramraj">Ramraj</option>
+                </select>
+            </div>
+            <!-- Submit Button -->
+            <button type="submit" class="btn btn-primary">Go to Dashboard</button>
+        </form>
+    </div>
+</body>
+</html>

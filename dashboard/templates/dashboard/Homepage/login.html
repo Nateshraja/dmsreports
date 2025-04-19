@@ -1,0 +1,84 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login - DMS Dashboard</title>
+    <link  rel="stylesheet" href="{% static 'vendor/bootstrap/css/bootstrap.min.css' %}">
+  <link rel="stylesheet" href="{% static 'vendor/bootstrap-icons/bootstrap-icons.css' %}">
+    <!-- Google Font: Roboto -->
+    <style>
+        body {
+            font-family: 'Roboto', sans-serif;
+            height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            background: linear-gradient(45deg, #f3f4f8, #f0f1f5);
+            animation: gradientAnimation 15s ease infinite;
+            margin: 0;
+        }
+
+        @keyframes gradientAnimation {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
+
+        .loader-container {
+            position: absolute;  /* Ensures full-page coverage */
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);  /* Perfect centering */
+            display: flex;
+            flex-direction: column;  /* Stacks loader & message vertically */
+            align-items: center;
+            justify-content: center;
+        }
+
+
+
+        .loader {
+            border: 6px solid #f3f4f8;
+            border-top: 6px solid #3498db;
+            border-radius: 50%;
+            width: 50px;
+            height: 50px;
+            animation: spin 1s linear infinite;
+            margin: auto;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .message {
+            margin-top: 20px;
+            font-size: 16px;
+            color: #4c4f56;
+        }
+    </style>
+</head>
+<body>
+    <div class="loader-container">
+        <div class="loader"></div>
+        <p class="message">Logging in, please wait...</p>
+    </div>
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+        // Extract URL parameters and set the values in hidden fields
+        window.onload = function() {
+            const param1 = getUrlParameter('param1');
+            const param2 = getUrlParameter('param2');
+
+            setSessionParameters(param1 ,param2);
+        }
+        });
+        
+    </script>
+    
+<script src="{% static 'js/basefunction.js' %}"></script>
+</body>
+</html>
