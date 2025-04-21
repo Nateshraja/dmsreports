@@ -26,7 +26,7 @@ SECRET_KEY = 'django-insecure-1530q5wh)8b7_raya9=y*p*&_ijr#g!yh6g_x+7fu#jjar(6!j
 DEBUG = True
 
 
-ALLOWED_HOSTS = ["192.168.179.19"]
+ALLOWED_HOSTS = ["*"]
 
 SESSION_ENGINE = 'django.contrib.sessions.backends.db'
 
