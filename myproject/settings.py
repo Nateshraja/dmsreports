@@ -86,7 +86,7 @@ DATABASES = {
         'ENGINE': 'django.db.backends.postgresql',
         'NAME': 'DMSLive',
         'USER': 'postgres',
-        'PASSWORD': 'Ramraj@147',
+        'PASSWORD': 'Ramraj@1234',
         'HOST': '192.168.0.89',  # Or the IP address of your PostgreSQL server
         'PORT': '5432',       # Default PostgreSQL port
     }
